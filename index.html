@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario ORDBMS</title>
+    <!-- Usamos Tailwind CSS para estilos rápidos y modernos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loader { border-top-color: #3498db; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">📦 Sistema de Inventario ORDBMS</h1>
+            <p class="text-gray-600">Demostración de Herencia, Tipos Compuestos y Métodos SQL</p>
+        </header>
+
+        <!-- SECCIÓN 1: FORMULARIO (Manejo de Tipos Compuestos) -->
+        <!-- Requisito: "Formulario que permita ingresar datos del tipo compuesto" -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-bold mb-4 border-b pb-2">➕ Crear Nueva Bebida</h2>
+            <form id="formBebida" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- Datos Base -->
+                <div class="col-span-1 md:col-span-3"><h3 class="text-sm font-semibold text-blue-600 uppercase">Datos Generales</h3></div>
+                <input type="text" id="nombre" placeholder="Nombre Producto" class="border p-2 rounded" required>
+                <input type="number" id="precio" placeholder="Precio ($)" step="0.01" class="border p-2 rounded" required>
+                <input type="number" id="stock" placeholder="Stock Inicial" class="border p-2 rounded" required>
+                <input type="number" id="id_ubicacion" placeholder="ID Ubicación (FK)" class="border p-2 rounded" required>
+
+                <!-- Datos Específicos (Subclase) -->
+                <div class="col-span-1 md:col-span-3 mt-2"><h3 class="text-sm font-semibold text-green-600 uppercase">Datos de Bebida (Herencia)</h3></div>
+                <input type="text" id="marca" placeholder="Marca" class="border p-2 rounded">
+                <input type="text" id="sabor" placeholder="Sabor" class="border p-2 rounded">
+                <select id="envase" class="border p-2 rounded">
+                    <option value="plastico">Plástico</option>
+                    <option value="lata">Lata</option>
+                    <option value="vidrio">Vidrio</option>
+                </select>
+                <input type="number" id="capacidad_ml" placeholder="Capacidad (ml)" class="border p-2 rounded">
+                <div class="flex items-center bg-gray-50 p-2 rounded border">
+                    <input type="checkbox" id="es_retornable" class="mr-2">
+                    <label for="es_retornable">¿Es Retornable?</label>
+                </div>
+
+                <!-- TIPO COMPUESTO (UDT) -->
+                <!-- Requisito: Campos separados que se mapean a un solo UDT -->
+                <div class="col-span-1 md:col-span-3 mt-2"><h3 class="text-sm font-semibold text-purple-600 uppercase">Dimensiones Físicas (Tipo Compuesto)</h3></div>
+                <div class="grid grid-cols-4 gap-2 col-span-1 md:col-span-3">
+                    <input type="number" id="alto" placeholder="Alto" class="border p-2 rounded bg-purple-50">
+                    <input type="number" id="ancho" placeholder="Ancho" class="border p-2 rounded bg-purple-50">
+                    <input type="number" id="profundidad" placeholder="Profundidad" class="border p-2 rounded bg-purple-50">
+                    <input type="text" id="unidad" value="cm" placeholder="Unidad" class="border p-2 rounded bg-purple-50">
+                </div>
+
+                <button type="submit" class="col-span-1 md:col-span-3 bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 mt-4">
+                    💾 Guardar en Base de Datos (Transacción)
+                </button>
+            </form>
+        </div>
+
+        <!-- SECCIÓN 2: TABLA POLIMÓRFICA -->
+        <!-- Requisito: "Página que muestre datos de la superclase y subclases en una tabla" -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">📋 Inventario Global</h2>
+                <button onclick="cargarProductos()" class="text-blue-500 hover:text-blue-700 underline text-sm">🔄 Recargar</button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left">ID</th>
+                            <th class="px-4 py-2 text-left">Tipo (Herencia)</th>
+                            <th class="px-4 py-2 text-left">Nombre</th>
+                            <th class="px-4 py-2 text-left">Precio</th>
+                            <th class="px-4 py-2 text-left">Dimensiones (UDT)</th>
+                            <th class="px-4 py-2 text-center">Acciones (Métodos)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaProductos" class="text-gray-700">
+                        <!-- Aquí se inyectan los datos con JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LÓGICA -->
+    <script>
+        const API_URL = 'http://localhost:8000/productos';
+
+        // 1. LEER (READ - Polimorfismo)
+        async function cargarProductos() {
+            try {
+                const response = await fetch(API_URL + '/');
+                const productos = await response.json();
+                const tbody = document.getElementById('tablaProductos');
+                tbody.innerHTML = '';
+
+                productos.forEach(p => {
+                    // Formatear UDT Dimensiones para visualización
+                    const dimsStr = p.dims 
+                        ? `${p.dims.medida_alto}x${p.dims.medida_ancho}x${p.dims.medida_profundidad} ${p.dims.unidad_medida}`
+                        : 'N/A';
+
+                    // Etiqueta de color según tipo (Polimorfismo Visual)
+                    const tipoBadge = `<span class="px-2 py-1 rounded text-xs font-bold 
+                        ${p.tipo_producto === 'bebida' ? 'bg-green-200 text-green-800' : 
+                          p.tipo_producto === 'carne' ? 'bg-red-200 text-red-800' : 'bg-gray-200'}">
+                        ${p.tipo_producto.toUpperCase()}
+                    </span>`;
+
+                    const row = `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2 font-mono text-sm">${p.id_prod}</td>
+                            <td class="px-4 py-2">${tipoBadge}</td>
+                            <td class="px-4 py-2 font-bold">${p.nombre}</td>
+                            <td class="px-4 py-2">$${p.precio}</td>
+                            <td class="px-4 py-2 text-sm text-gray-500">${dimsStr}</td>
+                            <td class="px-4 py-2 flex justify-center space-x-2">
+                                <button onclick="invocarMetodoSQL(${p.id_prod})" class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs hover:bg-purple-200" title="Llamar Stored Function">
+                                    ⚡ Valor (SQL)
+                                </button>
+                                <button onclick="eliminarProducto(${p.id_prod})" class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs hover:bg-red-200">
+                                    🗑️ Borrar
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Error cargando:", error);
+                alert("Error conectando a la API. Asegúrate que el Backend corre en el puerto 8000 y tiene CORS activado.");
+            }
+        }
+
+        // 2. CREAR (CREATE - Manejo de UDT y Herencia)
+        document.getElementById('formBebida').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Construimos el objeto JSON complejo
+            const nuevaBebida = {
+                // Atributos Padre
+                nombre: document.getElementById('nombre').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                stock: parseInt(document.getElementById('stock').value),
+                id_ubicacion: parseInt(document.getElementById('id_ubicacion').value),
+                
+                // Atributos Hijo (Bebida)
+                marca: document.getElementById('marca').value,
+                sabor: document.getElementById('sabor').value,
+                envase: document.getElementById('envase').value,
+                capacidad_ml: parseInt(document.getElementById('capacidad_ml').value) || 0,
+                es_retornable: document.getElementById('es_retornable').checked,
+
+                // Atributos UDT (Dimensiones) -> Empaquetados en un objeto
+                dims: {
+                    medida_alto: parseFloat(document.getElementById('alto').value) || 0,
+                    medida_ancho: parseFloat(document.getElementById('ancho').value) || 0,
+                    medida_profundidad: parseFloat(document.getElementById('profundidad').value) || 0,
+                    unidad_medida: document.getElementById('unidad').value
+                }
+            };
+
+            try {
+                const response = await fetch(API_URL + '/bebidas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nuevaBebida)
+                });
+
+                if (response.ok) {
+                    alert("¡Bebida creada exitosamente!");
+                    cargarProductos(); // Refrescar tabla
+                    document.getElementById('formBebida').reset();
+                } else {
+                    const error = await response.json();
+                    alert("Error: " + JSON.stringify(error));
+                }
+            } catch (error) {
+                alert("Error de red");
+            }
+        });
+
+        // 3. MÉTODO ALMACENADO (Interacción con Métodos)
+        async function invocarMetodoSQL(id) {
+            // Nota: Este endpoint debe existir en tu backend
+            try {
+                // Suponiendo que implementaste el endpoint sugerido anteriormente
+                const response = await fetch(`${API_URL}/${id}/valor-inventario`); 
+                if(response.ok) {
+                    const data = await response.json();
+                    alert(`💰 Cálculo desde PostgreSQL:\n\nEl valor total del inventario para el producto ${id} es: $${data.valor_inventario_calculado_en_db}`);
+                } else {
+                    alert("Para que esto funcione, recuerda agregar el endpoint del método almacenado en tu backend.");
+                }
+            } catch (error) {
+                alert("Error invocando método SQL.");
+            }
+        }
+
+        // 4. ELIMINAR (DELETE)
+        async function eliminarProducto(id) {
+            if(!confirm("¿Seguro que deseas eliminar este producto?")) return;
+            
+            await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            cargarProductos();
+        }
+
+        // Cargar al inicio
+        cargarProductos();
+    </script>
+</body>
+</html>
