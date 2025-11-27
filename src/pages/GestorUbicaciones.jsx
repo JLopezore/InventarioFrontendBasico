@@ -11,7 +11,9 @@ import {
   Package,
   MoveRight,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  AlertCircle,
+  CheckCircle
 } from 'lucide-react';
 import { 
   obtenerUbicaciones, 
@@ -36,6 +38,7 @@ const GestorUbicaciones = () => {
   const [nuevaUbicacionId, setNuevaUbicacionId] = useState('');
   const [ubicacionesExpandidas, setUbicacionesExpandidas] = useState({});
   const [formData, setFormData] = useState({
+    id_ubicacion: '',
     zona: '',
     estante: '',
     nivel: 1,
@@ -71,14 +74,36 @@ const GestorUbicaciones = () => {
   const abrirModalCrear = () => {
     setModoEdicion(false);
     setUbicacionSeleccionada(null);
-    setFormData({ zona: '', estante: '', nivel: 1 });
+    
+    // Calcular el próximo ID disponible automáticamente
+    const siguienteId = calcularSiguienteId();
+    
+    setFormData({ id_ubicacion: siguienteId, zona: '', estante: '', nivel: 1 });
     setModalAbierto(true);
+  };
+
+  const calcularSiguienteId = () => {
+    if (ubicaciones.length === 0) return 1;
+    
+    // Buscar todos los IDs existentes y encontrar el siguiente disponible
+    const idsExistentes = ubicaciones.map(ub => ub.id_ubicacion).sort((a, b) => a - b);
+    
+    // Buscar el primer hueco en la secuencia
+    for (let i = 1; i <= idsExistentes.length; i++) {
+      if (!idsExistentes.includes(i)) {
+        return i;
+      }
+    }
+    
+    // Si no hay huecos, devolver el siguiente después del máximo
+    return Math.max(...idsExistentes) + 1;
   };
 
   const abrirModalEditar = (ubicacion) => {
     setModoEdicion(true);
     setUbicacionSeleccionada(ubicacion);
     setFormData({
+      id_ubicacion: ubicacion.id_ubicacion,
       zona: ubicacion.zona,
       estante: ubicacion.estante,
       nivel: ubicacion.nivel,
@@ -89,19 +114,25 @@ const GestorUbicaciones = () => {
   const cerrarModal = () => {
     setModalAbierto(false);
     setUbicacionSeleccionada(null);
-    setFormData({ zona: '', estante: '', nivel: 1 });
+    setFormData({ id_ubicacion: '', zona: '', estante: '', nivel: 1 });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === 'nivel' ? parseInt(value) : value,
+      [name]: (name === 'nivel' || name === 'id_ubicacion') ? parseInt(value) : value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validar que todos los campos estén completos
+    if (!formData.id_ubicacion || !formData.zona.trim() || !formData.estante.trim() || !formData.nivel) {
+      alert('Por favor completa todos los campos de la ubicación');
+      return;
+    }
     
     try {
       if (modoEdicion && ubicacionSeleccionada) {
@@ -109,7 +140,13 @@ const GestorUbicaciones = () => {
         await actualizarUbicacion(ubicacionSeleccionada.id_ubicacion, formData);
         alert('Ubicación actualizada exitosamente');
       } else {
-        // Crear (POST)
+        // Crear (POST) - Validar que el ID no exista
+        const idExiste = ubicaciones.some(ub => ub.id_ubicacion === parseInt(formData.id_ubicacion));
+        if (idExiste) {
+          alert(`El ID ${formData.id_ubicacion} ya está en uso. Por favor, elige otro ID.`);
+          return;
+        }
+        
         await crearUbicacion(formData);
         alert('Ubicación creada exitosamente');
       }
@@ -329,6 +366,33 @@ const GestorUbicaciones = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="modal-form">
+              <div className="form-group">
+                <label htmlFor="id_ubicacion">ID Ubicación * (Autogenerado)</label>
+                <input
+                  type="number"
+                  id="id_ubicacion"
+                  name="id_ubicacion"
+                  value={formData.id_ubicacion}
+                  readOnly
+                  required
+                  disabled={modoEdicion}
+                  style={{
+                    backgroundColor: '#2a2a2a',
+                    cursor: 'default'
+                  }}
+                />
+                {modoEdicion ? (
+                  <small style={{ color: '#888', fontSize: '0.85rem' }}>
+                    El ID no se puede modificar en modo edición
+                  </small>
+                ) : (
+                  <small style={{ color: '#10b981', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <CheckCircle size={14} />
+                    ID asignado automáticamente
+                  </small>
+                )}
+              </div>
+
               <div className="form-group">
                 <label htmlFor="zona">Zona *</label>
                 <input

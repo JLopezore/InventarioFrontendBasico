@@ -473,6 +473,26 @@
   box-shadow: 0 6px 20px rgba(100, 108, 255, 0.5);
 }
 
+.btn-regenerar-id {
+  background: #646cff;
+  border: 2px solid #646cff;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.btn-regenerar-id:hover {
+  background: #535bf2;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.4);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .gestor-header {
