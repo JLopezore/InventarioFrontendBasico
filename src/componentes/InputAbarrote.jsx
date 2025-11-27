@@ -32,6 +32,12 @@ const InputAbarrote = ({ onAbarroteCreado }) => {
       return;
     }
 
+    // Validar campos específicos
+    if (!datosAbarrote.categoria.trim() || !datosAbarrote.marca.trim() || !datosAbarrote.peso_neto) {
+      alert('Por favor completa todos los campos de abarrote');
+      return;
+    }
+
     setCargando(true);
 
     const nuevoAbarrote = {
@@ -93,6 +99,7 @@ const InputAbarrote = ({ onAbarroteCreado }) => {
               onChange={handleAbarroteChange}
               placeholder="Categoría (ej: granos, cereales)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="text"
@@ -101,6 +108,7 @@ const InputAbarrote = ({ onAbarroteCreado }) => {
               onChange={handleAbarroteChange}
               placeholder="Marca"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="number"
@@ -109,7 +117,9 @@ const InputAbarrote = ({ onAbarroteCreado }) => {
               onChange={handleAbarroteChange}
               placeholder="Peso Neto (kg)"
               step="0.01"
+              min="0"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
           </div>
         </div>

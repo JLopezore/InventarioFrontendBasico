@@ -34,6 +34,12 @@ const InputCarne = ({ onCarneCreada }) => {
       return;
     }
 
+    // Validar campos específicos
+    if (!datosCarne.animal.trim() || !datosCarne.tipo_corte.trim() || !datosCarne.peso_kg || !datosCarne.temperatura_conservacion) {
+      alert('Por favor completa todos los campos de carne');
+      return;
+    }
+
     setCargando(true);
 
     const nuevaCarne = {
@@ -99,6 +105,7 @@ const InputCarne = ({ onCarneCreada }) => {
               onChange={handleCarneChange}
               placeholder="Animal (ej: res, cerdo, pollo)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="text"
@@ -107,6 +114,7 @@ const InputCarne = ({ onCarneCreada }) => {
               onChange={handleCarneChange}
               placeholder="Tipo de corte (ej: lomo, chuleta)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="number"
@@ -115,7 +123,9 @@ const InputCarne = ({ onCarneCreada }) => {
               onChange={handleCarneChange}
               placeholder="Peso (kg)"
               step="0.01"
+              min="0"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="number"
@@ -125,6 +135,7 @@ const InputCarne = ({ onCarneCreada }) => {
               placeholder="Temperatura de conservación (°C)"
               step="0.1"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <div className="flex items-center bg-[#2a2a2a] p-3 rounded border border-[#646cff]/50">
               <input

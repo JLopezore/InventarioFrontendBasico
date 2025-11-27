@@ -9,7 +9,9 @@ import {
   X, 
   ArrowLeft,
   Package,
-  MoveRight
+  MoveRight,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { 
   obtenerUbicaciones, 
@@ -32,6 +34,7 @@ const GestorUbicaciones = () => {
   const [ubicacionSeleccionada, setUbicacionSeleccionada] = useState(null);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [nuevaUbicacionId, setNuevaUbicacionId] = useState('');
+  const [ubicacionesExpandidas, setUbicacionesExpandidas] = useState({});
   const [formData, setFormData] = useState({
     zona: '',
     estante: '',
@@ -104,18 +107,18 @@ const GestorUbicaciones = () => {
       if (modoEdicion && ubicacionSeleccionada) {
         // Actualizar (PUT)
         await actualizarUbicacion(ubicacionSeleccionada.id_ubicacion, formData);
-        alert('✅ Ubicación actualizada exitosamente');
+        alert('Ubicación actualizada exitosamente');
       } else {
         // Crear (POST)
         await crearUbicacion(formData);
-        alert('✅ Ubicación creada exitosamente');
+        alert('Ubicación creada exitosamente');
       }
       
       cerrarModal();
       cargarUbicaciones();
     } catch (error) {
       console.error('Error al guardar ubicación:', error);
-      alert('❌ Error al guardar ubicación: ' + error.message);
+      alert('Error al guardar ubicación: ' + error.message);
     }
   };
 
@@ -126,11 +129,11 @@ const GestorUbicaciones = () => {
 
     try {
       await eliminarUbicacion(id);
-      alert('✅ Ubicación eliminada');
+      alert('Ubicación eliminada');
       cargarUbicaciones();
     } catch (error) {
       console.error('Error al eliminar:', error);
-      alert('❌ Error al eliminar ubicación');
+      alert('Error al eliminar ubicación');
     }
   };
 
@@ -169,16 +172,23 @@ const GestorUbicaciones = () => {
 
     try {
       await actualizarUbicacionProducto(productoSeleccionado.id_prod, parseInt(nuevaUbicacionId));
-      alert(`✅ Producto movido exitosamente a ubicación ${nuevaUbicacionId}`);
+      alert(`Producto movido exitosamente a ubicación ${nuevaUbicacionId}`);
       cerrarModalProductos();
       cargarProductos();
     } catch (error) {
       console.error('Error al mover producto:', error);
-      alert('❌ Error al mover producto: ' + error.message);
+      alert('Error al mover producto: ' + error.message);
     }
   };
 
   const zonas = agruparPorZona();
+
+  const toggleExpandirUbicacion = (idUbicacion) => {
+    setUbicacionesExpandidas(prev => ({
+      ...prev,
+      [idUbicacion]: !prev[idUbicacion]
+    }));
+  };
 
   return (
     <div className="gestor-ubicaciones-container">
@@ -219,6 +229,9 @@ const GestorUbicaciones = () => {
                 <div className="ubicaciones-grid">
                   {ubicacionesZona.map((ub) => {
                     const productosEnUbicacion = obtenerProductosPorUbicacion(ub.id_ubicacion);
+                    const estaExpandida = ubicacionesExpandidas[ub.id_ubicacion];
+                    const productosAMostrar = estaExpandida ? productosEnUbicacion : productosEnUbicacion.slice(0, 3);
+                    
                     return (
                       <div key={ub.id_ubicacion} className="ubicacion-card">
                         <div className="ubicacion-info">
@@ -233,7 +246,7 @@ const GestorUbicaciones = () => {
                           </div>
                           {productosEnUbicacion.length > 0 && (
                             <div className="productos-lista">
-                              {productosEnUbicacion.slice(0, 3).map(prod => (
+                              {productosAMostrar.map(prod => (
                                 <div key={prod.id_prod} className="producto-item">
                                   <span className="producto-nombre">{prod.nombre}</span>
                                   <button
@@ -246,7 +259,22 @@ const GestorUbicaciones = () => {
                                 </div>
                               ))}
                               {productosEnUbicacion.length > 3 && (
-                                <p className="mas-productos">+{productosEnUbicacion.length - 3} más...</p>
+                                <button 
+                                  className="btn-expandir-productos"
+                                  onClick={() => toggleExpandirUbicacion(ub.id_ubicacion)}
+                                >
+                                  {estaExpandida ? (
+                                    <>
+                                      <ChevronUp size={16} />
+                                      Mostrar menos
+                                    </>
+                                  ) : (
+                                    <>
+                                      <ChevronDown size={16} />
+                                      Ver todos ({productosEnUbicacion.length})
+                                    </>
+                                  )}
+                                </button>
                               )}
                             </div>
                           )}

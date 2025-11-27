@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #0a0a0a;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -32,6 +32,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: #0a0a0a;
 }
 
 h1 {
@@ -72,11 +73,18 @@ input[type="password"],
 select,
 textarea {
   color: white;
+  background-color: #2a2a2a;
 }
 
 input::placeholder,
 textarea::placeholder {
   color: rgba(255, 255, 255, 0.4);
+}
+
+select {
+  background-color: #2a2a2a;
+  border: 1px solid rgba(100, 108, 255, 0.5);
+  color: white;
 }
 
 select option {

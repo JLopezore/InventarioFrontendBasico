@@ -38,6 +38,12 @@ const InputBebida = ({ onBebidaCreada }) => {
       return;
     }
 
+    // Validar campos específicos
+    if (!datosBebida.marca.trim() || !datosBebida.sabor.trim() || !datosBebida.capacidad_ml) {
+      alert('Por favor completa todos los campos de bebida');
+      return;
+    }
+
     setCargando(true);
 
     // Construir objeto completo
@@ -113,6 +119,7 @@ const InputBebida = ({ onBebidaCreada }) => {
               onChange={handleBebidaChange}
               placeholder="Marca"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="text"
@@ -121,6 +128,7 @@ const InputBebida = ({ onBebidaCreada }) => {
               onChange={handleBebidaChange}
               placeholder="Sabor"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <select
               name="envase"
@@ -141,7 +149,9 @@ const InputBebida = ({ onBebidaCreada }) => {
               value={datosBebida.capacidad_ml}
               onChange={handleBebidaChange}
               placeholder="Capacidad (ml)"
+              min="0"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <div className="flex items-center bg-[#2a2a2a] p-3 rounded border border-[#646cff]/50">
               <input

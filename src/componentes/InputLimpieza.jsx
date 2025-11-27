@@ -34,6 +34,12 @@ const InputLimpieza = ({ onLimpiezaCreado }) => {
       return;
     }
 
+    // Validar campos específicos
+    if (!datosLimpieza.presentacion.trim() || !datosLimpieza.uso_principal.trim() || !datosLimpieza.contenido_neto || !datosLimpieza.unidad_contenido.trim()) {
+      alert('Por favor completa todos los campos de limpieza');
+      return;
+    }
+
     setCargando(true);
 
     const nuevaLimpieza = {
@@ -99,6 +105,7 @@ const InputLimpieza = ({ onLimpiezaCreado }) => {
               onChange={handleLimpiezaChange}
               placeholder="Presentación (ej: spray, líquido, polvo)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="text"
@@ -107,6 +114,7 @@ const InputLimpieza = ({ onLimpiezaCreado }) => {
               onChange={handleLimpiezaChange}
               placeholder="Uso principal (ej: pisos, baño, cocina)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="number"
@@ -115,7 +123,9 @@ const InputLimpieza = ({ onLimpiezaCreado }) => {
               onChange={handleLimpiezaChange}
               placeholder="Contenido neto"
               step="0.1"
+              min="0"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="text"
@@ -124,6 +134,7 @@ const InputLimpieza = ({ onLimpiezaCreado }) => {
               onChange={handleLimpiezaChange}
               placeholder="Unidad (ej: ml, L, g, kg)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <div className="flex items-center bg-[#2a2a2a] p-3 rounded border border-[#646cff]/50">
               <input

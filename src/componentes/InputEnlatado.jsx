@@ -33,6 +33,12 @@ const InputEnlatado = ({ onEnlatadoCreado }) => {
       return;
     }
 
+    // Validar campos específicos
+    if (!datosEnlatado.tipo_envase.trim() || !datosEnlatado.tipo_alimento.trim() || !datosEnlatado.peso_drenado || !datosEnlatado.peso_neto) {
+      alert('Por favor completa todos los campos de enlatado');
+      return;
+    }
+
     setCargando(true);
 
     const nuevoEnlatado = {
@@ -96,6 +102,7 @@ const InputEnlatado = ({ onEnlatadoCreado }) => {
               onChange={handleEnlatadoChange}
               placeholder="Tipo de envase (ej: lata, tetra pak)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="text"
@@ -104,6 +111,7 @@ const InputEnlatado = ({ onEnlatadoCreado }) => {
               onChange={handleEnlatadoChange}
               placeholder="Tipo de alimento (ej: atún, frijoles)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="number"
@@ -112,7 +120,9 @@ const InputEnlatado = ({ onEnlatadoCreado }) => {
               onChange={handleEnlatadoChange}
               placeholder="Peso drenado (gramos)"
               step="0.1"
+              min="0"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="number"
@@ -121,7 +131,9 @@ const InputEnlatado = ({ onEnlatadoCreado }) => {
               onChange={handleEnlatadoChange}
               placeholder="Peso neto (gramos)"
               step="0.1"
+              min="0"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
           </div>
         </div>

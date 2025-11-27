@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import InputProducto from './InputProducto';
-import { crearPanderia } from '../Services/api';
+import { crearPanaderia } from '../Services/api';
 import { Croissant, Save, Loader2 } from 'lucide-react';
 
 const InputPanaderia = ({ onPanaderiaCreado }) => {
   const [datosGenerales, setDatosGenerales] = useState(null);
   const [datosPanaderia, setDatosPanaderia] = useState({
+    fecha_caducidad: '',
     tipo_masa: '',
     presentacion: '',
     es_artesanal: false,
@@ -32,12 +33,19 @@ const InputPanaderia = ({ onPanaderiaCreado }) => {
       return;
     }
 
+    // Validar campos específicos
+    if (!datosPanaderia.fecha_caducidad || !datosPanaderia.tipo_masa.trim() || !datosPanaderia.presentacion.trim()) {
+      alert('Por favor completa todos los campos de panadería');
+      return;
+    }
+
     setCargando(true);
 
     const nuevaPanaderia = {
       nombre: datosGenerales.nombre,
       precio: parseFloat(datosGenerales.precio),
       stock: parseInt(datosGenerales.stock),
+      fecha_caducidad: datosPanaderia.fecha_caducidad,
       id_ubicacion: parseInt(datosGenerales.id_ubicacion),
       
       tipo_masa: datosPanaderia.tipo_masa,
@@ -53,10 +61,11 @@ const InputPanaderia = ({ onPanaderiaCreado }) => {
     };
 
     try {
-      await crearPanderia(nuevaPanaderia);
+      await crearPanaderia(nuevaPanaderia);
       alert('¡Producto de panadería creado exitosamente!');
       
       setDatosPanaderia({
+        fecha_caducidad: '',
         tipo_masa: '',
         presentacion: '',
         es_artesanal: false,
@@ -87,12 +96,22 @@ const InputPanaderia = ({ onPanaderiaCreado }) => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
+              type="date"
+              name="fecha_caducidad"
+              value={datosPanaderia.fecha_caducidad}
+              onChange={handlePanaderiaChange}
+              placeholder="Fecha de Caducidad"
+              className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
+            />
+            <input
               type="text"
               name="tipo_masa"
               value={datosPanaderia.tipo_masa}
               onChange={handlePanaderiaChange}
               placeholder="Tipo de masa (ej: hojaldre, brioche, baguette)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="text"
@@ -101,6 +120,7 @@ const InputPanaderia = ({ onPanaderiaCreado }) => {
               onChange={handlePanaderiaChange}
               placeholder="Presentación (ej: pieza, bolsa, paquete)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <div className="flex items-center bg-[#2a2a2a] p-3 rounded border border-[#646cff]/50">
               <input

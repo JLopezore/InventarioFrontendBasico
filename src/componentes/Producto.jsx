@@ -46,7 +46,7 @@ const Producto = ({ categoria = null, onRecargar }) => {
         'enlatados': 'enlatado',
         'licores': 'licor',
         'limpieza': 'limpieza',
-        'panaderia': 'panaderia'
+        'panaderia': 'pan'
       };
       
       // Usar el endpoint /productos/tipo/{tipo} según la categoría
@@ -117,6 +117,7 @@ const Producto = ({ categoria = null, onRecargar }) => {
       licor: <Martini {...iconProps} />,
       limpieza: <Sparkles {...iconProps} />,
       panaderia: <Croissant {...iconProps} />,
+      pan: <Croissant {...iconProps} />,
     };
     return iconos[tipo?.toLowerCase()] || <Package {...iconProps} />;
   };

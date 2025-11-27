@@ -34,6 +34,12 @@ const InputLicor = ({ onLicorCreado }) => {
       return;
     }
 
+    // Validar campos específicos (anos_anejamiento es opcional)
+    if (!datosLicor.tipo_licor.trim() || !datosLicor.grado_alcohol || !datosLicor.capacidad_ml || !datosLicor.pais_origen.trim()) {
+      alert('Por favor completa todos los campos requeridos de licor');
+      return;
+    }
+
     setCargando(true);
 
     const nuevoLicor = {
@@ -99,6 +105,7 @@ const InputLicor = ({ onLicorCreado }) => {
               onChange={handleLicorChange}
               placeholder="Tipo (ej: whisky, vodka, ron)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="number"
@@ -107,7 +114,10 @@ const InputLicor = ({ onLicorCreado }) => {
               onChange={handleLicorChange}
               placeholder="Grado Alcohol (%)"
               step="0.1"
+              min="0"
+              max="100"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="number"
@@ -116,7 +126,9 @@ const InputLicor = ({ onLicorCreado }) => {
               onChange={handleLicorChange}
               placeholder="Capacidad (ml)"
               step="1"
+              min="0"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="number"
@@ -125,6 +137,7 @@ const InputLicor = ({ onLicorCreado }) => {
               onChange={handleLicorChange}
               placeholder="Años de añejamiento (opcional)"
               step="1"
+              min="0"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
             />
             <input
@@ -134,6 +147,7 @@ const InputLicor = ({ onLicorCreado }) => {
               onChange={handleLicorChange}
               placeholder="País de origen"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
           </div>
         </div>

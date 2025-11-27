@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { obtenerUbicaciones } from '../Services/api';
 
 /**
  * Componente reutilizable para los campos comunes de todos los productos
  * (Datos Generales + Tipo Compuesto Dimensiones)
  */
 const InputProducto = ({ onDatosChange, valoresIniciales = {} }) => {
+  const [ubicaciones, setUbicaciones] = useState([]);
+  const [cargandoUbicaciones, setCargandoUbicaciones] = useState(true);
   const [datosProducto, setDatosProducto] = useState({
     nombre: valoresIniciales.nombre || '',
     precio: valoresIniciales.precio || '',
@@ -18,6 +21,23 @@ const InputProducto = ({ onDatosChange, valoresIniciales = {} }) => {
       unidad_medida: valoresIniciales.dims?.unidad_medida || 'cm',
     },
   });
+
+  useEffect(() => {
+    cargarUbicaciones();
+  }, []);
+
+  const cargarUbicaciones = async () => {
+    try {
+      setCargandoUbicaciones(true);
+      const data = await obtenerUbicaciones();
+      setUbicaciones(data);
+    } catch (error) {
+      console.error('Error al cargar ubicaciones:', error);
+      alert('Error al cargar ubicaciones. Por favor, verifica que el backend esté funcionando.');
+    } finally {
+      setCargandoUbicaciones(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -67,6 +87,7 @@ const InputProducto = ({ onDatosChange, valoresIniciales = {} }) => {
             onChange={handleChange}
             placeholder="Precio ($)"
             step="0.01"
+            min="0"
             className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
             required
           />
@@ -76,18 +97,34 @@ const InputProducto = ({ onDatosChange, valoresIniciales = {} }) => {
             value={datosProducto.stock}
             onChange={handleChange}
             placeholder="Stock Inicial"
+            min="0"
             className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
             required
           />
-          <input
-            type="number"
-            name="id_ubicacion"
-            value={datosProducto.id_ubicacion}
-            onChange={handleChange}
-            placeholder="ID Ubicación (FK)"
-            className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
-            required
-          />
+          <div className="relative">
+            <select
+              name="id_ubicacion"
+              value={datosProducto.id_ubicacion}
+              onChange={handleChange}
+              className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] w-full appearance-none cursor-pointer"
+              required
+              disabled={cargandoUbicaciones}
+            >
+              <option value="">
+                {cargandoUbicaciones ? 'Cargando ubicaciones...' : 'Seleccione una ubicación'}
+              </option>
+              {ubicaciones.map((ubicacion) => (
+                <option key={ubicacion.id_ubicacion} value={ubicacion.id_ubicacion}>
+                  {ubicacion.zona} - Estante {ubicacion.estante} - Nivel {ubicacion.nivel}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#646cff]">
+              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -103,6 +140,7 @@ const InputProducto = ({ onDatosChange, valoresIniciales = {} }) => {
             value={datosProducto.dims.medida_alto}
             onChange={handleChange}
             placeholder="Alto"
+            min="0"
             className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
           />
           <input
@@ -111,6 +149,7 @@ const InputProducto = ({ onDatosChange, valoresIniciales = {} }) => {
             value={datosProducto.dims.medida_ancho}
             onChange={handleChange}
             placeholder="Ancho"
+            min="0"
             className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
           />
           <input
@@ -119,6 +158,7 @@ const InputProducto = ({ onDatosChange, valoresIniciales = {} }) => {
             value={datosProducto.dims.medida_profundidad}
             onChange={handleChange}
             placeholder="Profundidad"
+            min="0"
             className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
           />
           <input

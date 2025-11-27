@@ -434,7 +434,7 @@ export const crearLimpieza = async (limpiezaData) => {
 
 export const obtenerPanaderia = async () => {
   try {
-    const response = await fetch(`${API_URL}/panaderia`);
+    const response = await fetch(`${API_URL}/panes`);
     if (!response.ok) throw new Error('Error al obtener panadería');
     return await response.json();
   } catch (error) {
@@ -445,7 +445,7 @@ export const obtenerPanaderia = async () => {
 
 export const crearPanaderia = async (panaderiaData) => {
   try {
-    const response = await fetch(`${API_URL}/panaderia`, {
+    const response = await fetch(`${API_URL}/panes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

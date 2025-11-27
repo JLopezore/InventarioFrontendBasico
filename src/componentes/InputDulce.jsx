@@ -33,6 +33,12 @@ const InputDulce = ({ onDulceCreado }) => {
       return;
     }
 
+    // Validar campos específicos
+    if (!datosDulce.tipo_empaque.trim() || !datosDulce.peso_unidad || !datosDulce.sabor.trim()) {
+      alert('Por favor completa todos los campos de dulce');
+      return;
+    }
+
     setCargando(true);
 
     const nuevoDulce = {
@@ -96,6 +102,7 @@ const InputDulce = ({ onDulceCreado }) => {
               onChange={handleDulceChange}
               placeholder="Tipo de empaque (ej: bolsa, caja)"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="number"
@@ -104,7 +111,18 @@ const InputDulce = ({ onDulceCreado }) => {
               onChange={handleDulceChange}
               placeholder="Peso por unidad (gramos)"
               step="0.1"
+              min="0"
               className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
+            />
+            <input
+              type="text"
+              name="sabor"
+              value={datosDulce.sabor}
+              onChange={handleDulceChange}
+              placeholder="Sabor"
+              className="border border-[#646cff]/50 bg-[#2a2a2a] text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#646cff] placeholder-gray-400"
+              required
             />
             <input
               type="text"
