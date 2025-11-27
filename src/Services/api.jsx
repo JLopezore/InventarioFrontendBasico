@@ -1,6 +1,6 @@
 // API Base URL
-const API_URL = 'https://stellar-nonmelodiously-jazlyn.ngrok-free.dev/productos';
-const UBICACIONES_URL = 'https://stellar-nonmelodiously-jazlyn.ngrok-free.dev/ubicaciones';
+const API_URL = 'http://localhost:8000/productos';
+const UBICACIONES_URL = 'http://localhost:8000/productos/ubicaciones';
 
 // ==================== UBICACIONES ====================
 
